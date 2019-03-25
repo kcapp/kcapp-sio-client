@@ -1,4 +1,4 @@
-var denbug = require('debug')('kcapp:client');
+var debug = require('debug')('kcapp:client');
 var io = require("socket.io-client");
 
 exports.DART_REIDAR_VENUE_ID = 4;

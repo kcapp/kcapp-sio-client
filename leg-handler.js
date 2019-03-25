@@ -1,4 +1,4 @@
-var denbug = require('debug')('kcapp:leg-handler');
+var debug = require('debug')('kcapp:leg-handler');
 var io = require("socket.io-client");
 
 var DART_MISS = { value: 0, multiplier: 1 };
