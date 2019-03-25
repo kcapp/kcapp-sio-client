@@ -18,9 +18,15 @@ function onConnected(data) {
  * @param {object} data - Data
  */
 function onScoreUpdate(data) {
-    this.currentPlayerId = data.leg.current_player_id;
+    var players = data.players;
+    for (var i = 0; i < players.length; i++) {
+        var player = players[i];
+        if (player.player_id === data.leg.current_player_id) {
+            this.currentPlayer = player;
+        }
+    }
     this.leg = data.leg;
-    this.players = data.players;
+    this.players = players;
 
     // Reset variables keeping track of throws
     this.throws = [];
@@ -51,7 +57,7 @@ exports.emitThrow = (dart, isUndo) => {
         this.throws.push(dart);
     }
     var payload = {
-        current_player_id: this.currentPlayerId,
+        current_player_id: this.currentPlayer.player_id,
         score: dart.score,
         multiplier: dart.multiplier,
         darts_thrown: this.dartsThrown,
@@ -66,7 +72,7 @@ exports.emitThrow = (dart, isUndo) => {
  */
 exports.emitVisit = () => {
     var payload = {
-        player_id: this.currentPlayerId,
+        player_id: this.currentPlayer.player_id,
         leg_id: this.id,
         first_dart: DART_MISS,
         second_dart: DART_MISS,
