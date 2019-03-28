@@ -1,4 +1,4 @@
-var debug = require('debug')('kcapp:client');
+var debug = require('debug')('kcapp-sio-client:client');
 var io = require("socket.io-client");
 
 exports.DART_REIDAR_VENUE_ID = 4;
@@ -9,7 +9,7 @@ exports.DART_REIDAR_VENUE_ID = 4;
  * @param {object} data - Data emitted when leg is finished
  */
 function onLegFinished(data) {
-    debug(`Leg ${data.old_leg_id} finished, setting up new namespace ${data.new_leg_id}`);
+    debug(`Leg ${data.old_leg_id} finished. Joining next leg ${data.new_leg_id}`);
     this.connectLegNamespace(data.new_leg_id, this.legConnectedCallback);
 }
 

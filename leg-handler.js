@@ -1,4 +1,4 @@
-var debug = require('debug')('kcapp:leg-handler');
+var debug = require('debug')('kcapp-sio-client:leg-handler');
 var io = require("socket.io-client");
 
 var DART_MISS = { value: 0, multiplier: 1 };
@@ -46,9 +46,28 @@ exports.on = (event, callback) => {
  * Emit a throw, indicating that the given dart was just thrown
  *
  * @param {object} dart - Dart thrown
- * @param {boolean} isUndo - True to undo last throw
  */
-exports.emitThrow = (dart, isUndo) => {
+exports.emitThrow = (dart,) => {
+    this.dartsThrown++;
+    this.throws.push(dart);
+
+    var payload = {
+        current_player_id: this.currentPlayer.player_id,
+        score: dart.score,
+        multiplier: dart.multiplier,
+        darts_thrown: this.dartsThrown,
+        is_undo: false
+    }
+    this.socket.emit('possible_throw', payload);
+    // TODO Auto throw after 3 darts?
+}
+
+/**
+ * Emit a throw, indicating that the given dart was just thrown
+ *
+ * @param {object} dart - Dart thrown
+ */
+exports.undoThrow = (dart) => {
     if (isUndo) {
         this.dartsThrown--;
         this.throws.splice(-1, 1);
@@ -61,10 +80,9 @@ exports.emitThrow = (dart, isUndo) => {
         score: dart.score,
         multiplier: dart.multiplier,
         darts_thrown: this.dartsThrown,
-        is_undo: isUndo
+        is_undo: true
     }
     this.socket.emit('possible_throw', payload);
-    // TODO Auto throw after 3 darts?
 }
 
 /**
@@ -91,10 +109,7 @@ exports.emitVisit = () => {
         var third = this.throws[2];
         payload.third_dart = { value: third.score, multiplier: third.multiplier };
     }
-
-    var json = JSON.stringify(payload);
-    debug(`Emitting visit ${json} to ${this.socket.nsp}`);
-    this.socket.emit('throw', json);
+    this.socket.emit('throw', JSON.stringify(payload));
 }
 
 /**
