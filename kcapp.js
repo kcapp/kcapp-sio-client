@@ -8,9 +8,9 @@ exports.DART_REIDAR_VENUE_ID = 4;
  * the namespace for the next leg
  * @param {object} data - Data emitted when leg is finished
  */
-function onLegFinished(data) {
-    debug(`Leg ${data.old_leg_id} finished. Joining next leg ${data.new_leg_id}`);
-    this.connectLegNamespace(data.new_leg_id, this.legConnectedCallback);
+function onNewLegStarted(data) {
+    debug(`Leg ${data.match.current_leg_id} finished. Joining next leg ${data.leg.id}`);
+    this.connectLegNamespace(data.leg.id, this.legConnectedCallback);
 }
 
 /**
@@ -28,7 +28,7 @@ exports.on = (event, callback) => {
  */
 exports.connectLegNamespace = (id, callback) => {
     var leg = this.legHandler.connect(id, callback);
-    leg.socket.on('leg_finished', onLegFinished.bind(this));
+    leg.socket.on('new_leg', onNewLegStarted.bind(this));
     this.legs[id] = leg;
     this.legConnectedCallback = callback;
 }
