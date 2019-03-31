@@ -47,7 +47,7 @@ exports.on = (event, callback) => {
  *
  * @param {object} dart - Dart thrown
  */
-exports.emitThrow = (dart,) => {
+exports.emitThrow = (dart, ) => {
     this.dartsThrown++;
     this.throws.push(dart);
 
@@ -89,26 +89,19 @@ exports.undoThrow = (dart) => {
  * Emit a visit, this will confirm the visit, and write all values to database
  */
 exports.emitVisit = () => {
+    if (this.dartsThrown < 3) {
+        for (var i = 0; i < this.dartsThrown; i++) {
+            emitThrow(DART_MISS);
+        }
+    }
+
     var payload = {
         player_id: this.currentPlayer.player_id,
         leg_id: this.id,
-        first_dart: DART_MISS,
-        second_dart: DART_MISS,
-        third_dart: DART_MISS
+        first_dart: { value: this.throws[0].score, multiplier: this.throws[0].multiplier },
+        second_dart: { value: this.throws[1].score, multiplier: this.throws[1].multiplier },
+        third_dart: { value: this.throws[2].score, multiplier: this.throws[2].multiplier }
     };
-
-    if (this.throws[0]) {
-        var first = this.throws[0];
-        payload.first_dart = { value: first.score, multiplier: first.multiplier };
-    }
-    if (this.throws[1]) {
-        var second = this.throws[1];
-        payload.second_dart = { value: second.score, multiplier: second.multiplier };
-    }
-    if (this.throws[2]) {
-        var third = this.throws[2];
-        payload.third_dart = { value: third.score, multiplier: third.multiplier };
-    }
     this.socket.emit('throw', JSON.stringify(payload));
 }
 
