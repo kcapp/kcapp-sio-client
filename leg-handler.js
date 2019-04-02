@@ -1,7 +1,7 @@
 var debug = require('debug')('kcapp-sio-client:leg-handler');
 var io = require("socket.io-client");
 
-var DART_MISS = { value: 0, multiplier: 1 };
+var DART_MISS = { score: 0, multiplier: 1 };
 
 /**
  * Handle a connected event
@@ -47,7 +47,7 @@ exports.on = (event, callback) => {
  *
  * @param {object} dart - Dart thrown
  */
-exports.emitThrow = (dart, ) => {
+exports.emitThrow = (dart) => {
     this.dartsThrown++;
     this.throws.push(dart);
 
@@ -59,6 +59,7 @@ exports.emitThrow = (dart, ) => {
         is_undo: false
     }
     this.socket.emit('possible_throw', payload);
+    //this.currentPlayer.current_score -= dart.score * dart.multiplier;
     // TODO Auto throw after 3 darts?
 }
 
@@ -68,13 +69,9 @@ exports.emitThrow = (dart, ) => {
  * @param {object} dart - Dart thrown
  */
 exports.undoThrow = (dart) => {
-    if (isUndo) {
-        this.dartsThrown--;
-        this.throws.splice(-1, 1);
-    } else {
-        this.dartsThrown++;
-        this.throws.push(dart);
-    }
+    this.dartsThrown--;
+    this.throws.splice(-1, 1);
+
     var payload = {
         current_player_id: this.currentPlayer.player_id,
         score: dart.score,
@@ -90,8 +87,8 @@ exports.undoThrow = (dart) => {
  */
 exports.emitVisit = () => {
     if (this.dartsThrown < 3) {
-        for (var i = 0; i < this.dartsThrown; i++) {
-            emitThrow(DART_MISS);
+        for (var i = 0; i <= 3 - this.dartsThrown; i++) {
+            this.emitThrow(DART_MISS);
         }
     }
 
