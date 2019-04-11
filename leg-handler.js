@@ -34,6 +34,25 @@ function onScoreUpdate(data) {
 }
 
 /**
+ * Handle possible throw event
+ * @param {object} data - Data
+ */
+function onPossibleThrow(data) {
+    if (data.origin === this.origin) {
+        // We don't need to handle updates from ourselves
+        return;
+    }
+
+    if (data.is_undo) {
+        this.dartsThrown--;
+        this.throws.splice(-1, 1);
+    } else {
+        this.throws.push({ score: data.score, multiplier: data.multiplier });
+        this.dartsThrown++;
+    }
+}
+
+/**
  * Register a callback for the given event
  * @param {string} event - Socket IO Event to register callback for
  * @param {function} callback - Callback when event is emitted
@@ -56,6 +75,7 @@ exports.emitThrow = (dart) => {
         score: dart.score,
         multiplier: dart.multiplier,
         darts_thrown: this.dartsThrown,
+        origin: this.origin,
         is_undo: false
     }
     this.socket.emit('possible_throw', payload);
@@ -87,7 +107,7 @@ exports.undoThrow = (dart) => {
  */
 exports.emitVisit = () => {
     if (this.dartsThrown < 3) {
-        for (var i = 0; i <= 3 - this.dartsThrown; i++) {
+        for (var i = this.dartsThrown; i < 3; i++) {
             this.emitThrow(DART_MISS);
         }
     }
@@ -117,6 +137,7 @@ exports.connect = (id, callback) => {
     });
     this.socket.on('connected', onConnected.bind(this));
     this.socket.on('score_update', onScoreUpdate.bind(this));
+    this.socket.on('possible_throw', onPossibleThrow.bind(this));
     return this;
 }
 
@@ -131,8 +152,10 @@ exports.disconnect = () => {
 /**
  * Configure the leg-handler
  * @param {string} baseURL - BaseURL of socket.io endpoint
+ * @param {string} origin - Origin of events to send when emitting throws
  */
-module.exports = (baseURL) => {
+module.exports = (baseURL, origin) => {
     this.baseURL = baseURL;
+    this.origin = origin;
     return this;
 }

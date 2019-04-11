@@ -55,11 +55,16 @@ exports.disconnect = () => {
 /**
  * Configure the kcapp module
  * @param {string} ip - IP of socket.io endpoint
- * @param {int} port = Port of socket.io endpoint
+ * @param {int} port - Port of socket.io endpoint
+ * @param {string} origin - Origin of events to send when emitting throws
  */
-module.exports = (ip, port) => {
+module.exports = (ip, port, origin) => {
+    if (!origin) {
+        origin = 'kcapp-sio-client';
+    }
+    this.origin = origin;
     this.baseURL = `http://${ip}:${port}`;
-    this.legHandler = require('./leg-handler')(this.baseURL);
+    this.legHandler = require('./leg-handler')(this.baseURL, this.origin);
     this.legs = {};
     return this;
 };
