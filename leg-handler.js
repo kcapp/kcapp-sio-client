@@ -62,6 +62,15 @@ exports.on = (event, callback) => {
 }
 
 /**
+ * Emit the given event, with given data
+ * @param {string} - Socket IO event to emit
+ * @param {object} - Data to emit with event
+ */
+exports.emit = (event, data) => {
+    this.socket.emit(event, JSON.stringify(data));
+}
+
+/**
  * Emit a throw, indicating that the given dart was just thrown
  *
  * @param {object} dart - Dart thrown
