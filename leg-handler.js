@@ -67,7 +67,7 @@ exports.on = (event, callback) => {
  * @param {object} - Data to emit with event
  */
 exports.emit = (event, data) => {
-    this.socket.emit(event, JSON.stringify(data));
+    this.socket.emit(event, data);
 }
 
 /**
