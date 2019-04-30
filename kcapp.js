@@ -39,16 +39,21 @@ exports.connectLegNamespace = (id, callback) => {
 exports.connect = (callback) => {
     this.socket = io(`${this.baseURL}/active`);
     this.socket.on('connect', (data) => {
+        if (this.connected) {
+            debug("Already connected to /active");
+            return;
+        }
         debug(`Connected to namespace "${this.socket.nsp}" on "${this.baseURL}"`)
+        this.connected = true;
         callback(data);
     });
 }
-
 /**
  * Disconnect from the socket
  */
 exports.disconnect = () => {
     this.socket.disconnect();
+	this.connected = false;
     debug(`Disconnected from "${this.socket.nsp}"`);
 }
 
