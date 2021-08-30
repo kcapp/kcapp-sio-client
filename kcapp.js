@@ -9,8 +9,8 @@ exports.DART_REIDAR_VENUE_ID = 4;
  * @param {object} data - Data emitted when leg is finished
  */
 function onNewLegStarted(data) {
-    debug(`Leg ${data.match.current_leg_id} finished. Joining next leg ${data.leg.id}`);
-    this.connectLegNamespace(data.leg.id, this.legConnectedCallback);
+    debug(`Leg ${data.leg.id} finished. Joining next leg ${data.match.current_leg_id}`);
+    this.connectLegNamespace(data.match.current_leg_id, this.legConnectedCallback);
 }
 
 /**
@@ -62,13 +62,12 @@ exports.disconnect = () => {
  * @param {string} ip - IP of socket.io endpoint
  * @param {int} port - Port of socket.io endpoint
  * @param {string} origin - Origin of events to send when emitting throws
+ * @param {string} scheme - Scheme
  */
-module.exports = (ip, port, origin) => {
-    if (!origin) {
-        origin = 'kcapp-sio-client';
-    }
+module.exports = (ip, port, origin = 'kcapp-sio-client', scheme = 'https') => {
     this.origin = origin;
-    this.baseURL = `http://${ip}:${port}`;
+    this.baseURL = `${scheme}://${ip}:${port}`;
+    debug(`Using base URL ${this.baseURL}`);
     this.legHandler = require('./leg-handler')(this.baseURL, this.origin);
     this.legs = {};
     return this;

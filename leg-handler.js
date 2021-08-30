@@ -84,8 +84,8 @@ exports.emitThrow = (dart) => {
         score: dart.score,
         multiplier: dart.multiplier,
         darts_thrown: this.dartsThrown,
-        origin: this.origin,
-        is_undo: false
+        is_undo: false,
+        origin: this.origin
     }
     this.socket.emit('possible_throw', payload);
     //this.currentPlayer.current_score -= dart.score * dart.multiplier;
@@ -106,7 +106,8 @@ exports.undoThrow = (dart) => {
         score: dart.score,
         multiplier: dart.multiplier,
         darts_thrown: this.dartsThrown,
-        is_undo: true
+        is_undo: true,
+        origin: this.origin
     }
     this.socket.emit('possible_throw', payload);
 }
