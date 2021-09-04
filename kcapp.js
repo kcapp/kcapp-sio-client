@@ -1,5 +1,5 @@
-var debug = require('debug')('kcapp-sio-client:client');
-var io = require("socket.io-client");
+const debug = require('debug')('kcapp-sio-client:client');
+const io = require("socket.io-client");
 
 exports.DART_REIDAR_VENUE_ID = 4;
 
@@ -27,7 +27,7 @@ exports.on = (event, callback) => {
  * @param {int} id - Leg ID
  */
 exports.connectLegNamespace = (id, callback) => {
-    var leg = this.legHandler.connect(id, callback);
+    const leg = this.legHandler.connect(id, callback);
     leg.socket.on('new_leg', onNewLegStarted.bind(this));
     this.legs[id] = leg;
     this.legConnectedCallback = callback;
@@ -62,9 +62,14 @@ exports.disconnect = () => {
  * @param {string} ip - IP of socket.io endpoint
  * @param {int} port - Port of socket.io endpoint
  * @param {string} origin - Origin of events to send when emitting throws
- * @param {string} scheme - Scheme
+ * @param {string} scheme - Scheme, if ip contains scheme it will be used instead
  */
 module.exports = (ip, port, origin = 'kcapp-sio-client', scheme = 'https') => {
+    if (ip.includes("://")) {
+        scheme = ip.split("://")[0];
+        ip = ip.split("://")[1];
+    }
+
     this.origin = origin;
     this.baseURL = `${scheme}://${ip}:${port}`;
     debug(`Using base URL ${this.baseURL}`);
