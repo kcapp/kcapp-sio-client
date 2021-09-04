@@ -47,6 +47,16 @@ exports.connect = (callback) => {
         this.connected = true;
         callback(data);
     });
+
+    this.socket.io.on("reconnect", () => {
+        debug(`Reconnected to '/active'`);
+        this.connected = true;
+    });
+
+    this.socket.on("disconnect", (reason) => {
+        debug(`Disconnected from '/active' because: "${reason}"`);
+        this.connected = false;
+    });
 }
 /**
  * Disconnect from the socket

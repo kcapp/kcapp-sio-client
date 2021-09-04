@@ -148,6 +148,13 @@ exports.connect = (id, callback) => {
     this.socket.on('connected', onConnected.bind(this));
     this.socket.on('score_update', onScoreUpdate.bind(this));
     this.socket.on('possible_throw', onPossibleThrow.bind(this));
+    this.socket.io.on("reconnect", () => {
+        debug(`Reconnected to '/legs/${id}'`);
+    });
+
+    this.socket.on("disconnect", (reason) => {
+        debug(`Disconnected from '/legs/${id}' because: "${reason}"`);
+    });
     return this;
 }
 
