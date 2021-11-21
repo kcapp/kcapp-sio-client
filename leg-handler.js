@@ -1,7 +1,7 @@
-var debug = require('debug')('kcapp-sio-client:leg-handler');
-var io = require("socket.io-client");
+const debug = require('debug')('kcapp-sio-client:leg-handler');
+const io = require("socket.io-client");
 
-var DART_MISS = { score: 0, multiplier: 1 };
+const DART_MISS = { score: 0, multiplier: 1 };
 
 /**
  * Handle a connected event
@@ -18,9 +18,9 @@ function onConnected(data) {
  * @param {object} data - Data
  */
 function onScoreUpdate(data) {
-    var players = data.players;
-    for (var i = 0; i < players.length; i++) {
-        var player = players[i];
+    const players = data.players;
+    for (let i = 0; i < players.length; i++) {
+        const player = players[i];
         if (player.player_id === data.leg.current_player_id) {
             this.currentPlayer = player;
         }
@@ -79,7 +79,7 @@ exports.emitThrow = (dart) => {
     this.dartsThrown++;
     this.throws.push(dart);
 
-    var payload = {
+    const payload = {
         current_player_id: this.currentPlayer.player_id,
         score: dart.score,
         multiplier: dart.multiplier,
@@ -101,7 +101,7 @@ exports.undoThrow = (dart) => {
     this.dartsThrown--;
     this.throws.splice(-1, 1);
 
-    var payload = {
+    const payload = {
         current_player_id: this.currentPlayer.player_id,
         score: dart.score,
         multiplier: dart.multiplier,
@@ -117,12 +117,12 @@ exports.undoThrow = (dart) => {
  */
 exports.emitVisit = () => {
     if (this.dartsThrown < 3) {
-        for (var i = this.dartsThrown; i < 3; i++) {
+        for (let i = this.dartsThrown; i < 3; i++) {
             this.emitThrow(DART_MISS);
         }
     }
 
-    var payload = {
+    const payload = {
         player_id: this.currentPlayer.player_id,
         leg_id: this.id,
         first_dart: { value: this.throws[0].score, multiplier: this.throws[0].multiplier },
