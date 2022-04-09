@@ -53,6 +53,24 @@ function onPossibleThrow(data) {
 }
 
 /**
+ * Handle order changed events by updating current player
+ * @param {object} data  - Data
+ */
+function onOrderChanged(data) {
+    const players = data.players;
+
+    this.leg = data.leg;
+    this.players = players;
+
+    for (let i = 0; i < players.length; i++) {
+        let player = players[i];
+        if (player.player_id === data.leg.current_player_id) {
+            this.currentPlayer = player;
+        }
+    }
+}
+
+/**
  * Register a callback for the given event
  * @param {string} event - Socket IO Event to register callback for
  * @param {function} callback - Callback when event is emitted
@@ -148,6 +166,7 @@ exports.connect = (id, callback) => {
     this.socket.on('connected', onConnected.bind(this));
     this.socket.on('score_update', onScoreUpdate.bind(this));
     this.socket.on('possible_throw', onPossibleThrow.bind(this));
+    this.socket.on('order_changed', onOrderChanged.bind(this));
     this.socket.io.on("reconnect", () => {
         debug(`Reconnected to '/legs/${id}'`);
     });
