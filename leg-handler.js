@@ -19,12 +19,7 @@ function onConnected(data) {
  */
 function onScoreUpdate(data) {
     const players = data.players;
-    for (let i = 0; i < players.length; i++) {
-        const player = players[i];
-        if (player.player_id === data.leg.current_player_id) {
-            this.currentPlayer = player;
-        }
-    }
+    this.currentPlayer = players.find(player => player.player_id === data.leg.current_player_id);
     this.leg = data.leg;
     this.players = players;
 
@@ -62,12 +57,7 @@ function onOrderChanged(data) {
     this.leg = data.leg;
     this.players = players;
 
-    for (let i = 0; i < players.length; i++) {
-        let player = players[i];
-        if (player.player_id === data.leg.current_player_id) {
-            this.currentPlayer = player;
-        }
-    }
+    this.currentPlayer = players.find(player => player.player_id === data.leg.current_player_id);
 }
 
 /**
@@ -106,8 +96,6 @@ exports.emitThrow = (dart) => {
         origin: this.origin
     }
     this.socket.emit('possible_throw', payload);
-    //this.currentPlayer.current_score -= dart.score * dart.multiplier;
-    // TODO Auto throw after 3 darts?
 }
 
 /**
@@ -167,11 +155,15 @@ exports.connect = (id, callback) => {
     this.socket.on('score_update', onScoreUpdate.bind(this));
     this.socket.on('possible_throw', onPossibleThrow.bind(this));
     this.socket.on('order_changed', onOrderChanged.bind(this));
-    this.socket.io.on("reconnect", () => {
+    this.socket.io.on('reconnect', () => {
         debug(`Reconnected to '/legs/${id}'`);
     });
+    this.socket.on('leg_finished', () => {
+        // Make sure we disconnect once leg is finished, to clean up our connections
+        this.socket.disconnect();
+    });
 
-    this.socket.on("disconnect", (reason) => {
+    this.socket.on('disconnect', (reason) => {
         debug(`Disconnected from '/legs/${id}' because: "${reason}"`);
     });
     return this;

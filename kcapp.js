@@ -1,8 +1,6 @@
 const debug = require('debug')('kcapp-sio-client:client');
 const io = require("socket.io-client");
 
-exports.DART_REIDAR_VENUE_ID = 4;
-
 /**
  * Handle the leg_finished event, by setting up, and connecting to
  * the namespace for the next leg
@@ -37,7 +35,9 @@ exports.connectLegNamespace = (id, callback) => {
  * Connect to the socket
  */
 exports.connect = (callback) => {
-    this.socket = io(`${this.baseURL}/active`);
+    this.socket = io(`${this.baseURL}/active`, {
+        extraHeaders: { "user-agent": this.origin }
+    });
     this.socket.on('connect', (data) => {
         if (this.connected) {
             debug("Already connected to /active");
