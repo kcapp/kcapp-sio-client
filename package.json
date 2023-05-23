@@ -4,6 +4,6 @@
     "private": true,
     "dependencies": {
         "debug": "^4.3.4",
-        "socket.io-client": "^4.2.0"
+        "socket.io-client": "^4.6.1"
     }
 }
